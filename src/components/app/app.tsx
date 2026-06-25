@@ -6,6 +6,7 @@ import { ArticleParamsForm } from '../article-params-form/ArticleParamsForm';
 import {
 	ArticleStateType,
 	defaultArticleState,
+	OptionType,
 } from './../../constants/articleProps';
 
 import styles from './app.module.scss';
@@ -28,7 +29,10 @@ export const App = () => {
 		setArticleState(defaultArticleState);
 	};
 
-	const handleFormChange = (field: keyof ArticleStateType, value: any) => {
+	const handleFormChange = (
+		field: keyof ArticleStateType,
+		value: OptionType
+	) => {
 		setFormState((prev) => ({
 			...prev,
 			[field]: value,
@@ -51,9 +55,11 @@ export const App = () => {
 				isOpened={isOpened}
 				onToggle={() => setIsOpened(!isOpened)}
 				formState={formState}
-				onFormChange={handleFormChange}
-				onApply={handleApply}
-				onReset={handleReset}
+				handlers={{
+					onChange: handleFormChange,
+					onApply: handleApply,
+					onReset: handleReset,
+				}}
 			/>
 			<Article />
 		</main>

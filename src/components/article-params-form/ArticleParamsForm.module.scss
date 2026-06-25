@@ -3,7 +3,7 @@
 	left: 0;
 	width: 616px;
 	height: 100%;
-	overflow: scroll;
+	overflow-y: auto;
 	transform: translate(-616px);
 	transition: transform 0.5s ease;
 }
@@ -16,9 +16,9 @@
 	display: flex;
 	flex-shrink: 0;
 	flex-direction: column;
+	gap: 36px;
 	box-sizing: border-box;
-	width: 616px;
-	height: auto;
+	width: 614px;
 	min-height: 100%;
 	padding: 50px 31px;
 	background-color: #ffffff;
@@ -29,4 +29,14 @@
 	display: flex;
 	justify-content: space-between;
 	margin-top: auto;
+}
+
+.title {
+	margin-bottom: 32px;
+	color: #000000;
+	font-weight: 800;
+	font-size: 31px;
+	font-family: 'Open Sans', sans-serif;
+	line-height: 1;
+	text-transform: uppercase;
 }
