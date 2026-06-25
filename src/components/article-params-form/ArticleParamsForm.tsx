@@ -1,7 +1,10 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
 import clsx from 'clsx';
+import { Select } from 'src/ui/select';
+import { RadioGroup } from 'src/ui/radio-group';
+import { Separator } from 'src/ui/separator';
 
 import styles from './ArticleParamsForm.module.scss';
 import {
@@ -9,44 +12,34 @@ import {
 	OptionType,
 	backgroundColors,
 	contentWidthArr,
+	defaultArticleState,
 	fontColors,
 	fontFamilyOptions,
 	fontSizeOptions,
 } from 'src/constants/articleProps';
-import { Select } from 'src/ui/select';
-import { RadioGroup } from 'src/ui/radio-group';
-import { Separator } from 'src/ui/separator';
 
 type ArticleParamsFormProps = {
-	isOpened: boolean;
-	onToggle: () => void;
-	formState: ArticleStateType;
-	handlers: {
-		onChange: (field: keyof ArticleStateType, value: OptionType) => void;
-		onApply: () => void;
-		onReset: () => void;
-	};
+	onApply: (state: ArticleStateType) => void;
 };
 
-export const ArticleParamsForm = ({
-	isOpened,
-	onToggle,
-	formState,
-	handlers,
-}: ArticleParamsFormProps) => {
+export const ArticleParamsForm = ({ onApply }: ArticleParamsFormProps) => {
+	const [isOpened, setIsOpened] = useState<boolean>(false);
+	const [formState, setFormState] =
+		useState<ArticleStateType>(defaultArticleState);
 	const asideRef = useRef<HTMLElement>(null);
+	const arrowRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				asideRef.current &&
-				!asideRef.current.contains(event.target as Node)
-			) {
-				const target = event.target as HTMLElement;
-				const isArrowButton = target.closest('[class*="ArrowButton"]');
-				if (!isArrowButton && isOpened) {
-					onToggle();
-				}
+			if (!asideRef.current || !arrowRef.current) return;
+
+			const target = event.target as Node;
+
+			const isOutsideSidebar = !asideRef.current.contains(target);
+			const isOutsideArrow = !arrowRef.current.contains(target);
+
+			if (isOutsideSidebar && isOutsideArrow && isOpened) {
+				setIsOpened(false);
 			}
 		};
 		if (isOpened) {
@@ -55,15 +48,33 @@ export const ArticleParamsForm = ({
 		return () => {
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
-	}, [isOpened, onToggle]);
+	}, [isOpened]);
 
 	const handleChange =
 		(field: keyof ArticleStateType) => (value: OptionType) => {
-			handlers.onChange(field, value);
+			setFormState((prev) => ({ ...prev, [field]: value }));
 		};
+	const handleReselt = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		setFormState(defaultArticleState);
+	};
+
+	const handleSubmit = (e: React.FocusEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		onApply(formState);
+		setIsOpened(false);
+	};
+
 	return (
 		<>
-			<ArrowButton isOpen={isOpened} onClick={onToggle} />
+			<div ref={arrowRef}>
+				<ArrowButton
+					isOpen={isOpened}
+					onClick={() => {
+						setIsOpened(!isOpened);
+					}}
+				/>
+			</div>
 
 			<aside
 				ref={asideRef}
@@ -72,14 +83,8 @@ export const ArticleParamsForm = ({
 				})}>
 				<form
 					className={styles.form}
-					onSubmit={(e) => {
-						e.preventDefault();
-						handlers.onApply();
-					}}
-					onReset={(e) => {
-						e.preventDefault();
-						handlers.onReset();
-					}}>
+					onSubmit={handleSubmit}
+					onReset={handleReselt}>
 					<h2 className={styles.title}>ЗАДАЙТЕ ПАРАМЕТРЫ</h2>
 
 					<Select

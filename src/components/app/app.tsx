@@ -1,47 +1,25 @@
 import { CSSProperties, useState } from 'react';
-import clsx from 'clsx';
 
 import { Article } from '../article/Article';
 import { ArticleParamsForm } from '../article-params-form/ArticleParamsForm';
 import {
 	ArticleStateType,
 	defaultArticleState,
-	OptionType,
 } from './../../constants/articleProps';
 
 import styles from './app.module.scss';
 
 export const App = () => {
-	const [isOpened, setIsOpened] = useState<boolean>(false);
-
-	const [formState, setFormState] =
-		useState<ArticleStateType>(defaultArticleState);
-
 	const [articleState, setArticleState] =
 		useState<ArticleStateType>(defaultArticleState);
 
-	const handleApply = () => {
-		setArticleState(formState);
-	};
-
-	const handleReset = () => {
-		setFormState(defaultArticleState);
-		setArticleState(defaultArticleState);
-	};
-
-	const handleFormChange = (
-		field: keyof ArticleStateType,
-		value: OptionType
-	) => {
-		setFormState((prev) => ({
-			...prev,
-			[field]: value,
-		}));
+	const handleApply = (newState: ArticleStateType) => {
+		setArticleState(newState);
 	};
 
 	return (
 		<main
-			className={clsx(styles.main)}
+			className={styles.main}
 			style={
 				{
 					'--font-family': articleState.fontFamilyOption.value,
@@ -51,16 +29,7 @@ export const App = () => {
 					'--bg-color': articleState.backgroundColor.value,
 				} as CSSProperties
 			}>
-			<ArticleParamsForm
-				isOpened={isOpened}
-				onToggle={() => setIsOpened(!isOpened)}
-				formState={formState}
-				handlers={{
-					onChange: handleFormChange,
-					onApply: handleApply,
-					onReset: handleReset,
-				}}
-			/>
+			<ArticleParamsForm onApply={handleApply} />
 			<Article />
 		</main>
 	);
